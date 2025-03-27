@@ -6,12 +6,19 @@
 #define WINDOW_HEIGHT 1000
 
 struct Param {
-    double offsetX;
-    double offsetY;
-    double scale;
+    float offsetX;
+    float offsetY;
+    float scale;
+};
+
+struct Color {
+    char red;
+    char green;
+    char blue;
 };
 
 void GetPoint (sfVertexArray* vertex_array, Param* param);
+void GetColor (int iterations, Color* color);
 
 int main() 
 {
@@ -29,9 +36,9 @@ int main()
     sfFont* font = sfFont_createFromFile("1.otf");
     
     sfText* text = sfText_create();
-    sfText_setFont(text, font);  // Устанавливаем шрифт
-    sfText_setCharacterSize(text, 30);  // Устанавливаем размер шрифта
-    sfText_setColor(text, sfWhite);  // Устанавливаем цвет текста
+    sfText_setFont(text, font); 
+    sfText_setCharacterSize(text, 30); 
+    sfText_setColor(text, sfWhite);  
 
     while (sfRenderWindow_isOpen(window)) 
     {
@@ -46,28 +53,33 @@ int main()
                 switch ((int) event.key.code)
                 {
                     case sfKeyDown:
-                        param.offsetY += 0.5;
+                        param.offsetY += param.scale * 0.1;
                         break;
 
                     case sfKeyLeft:
-                        param.offsetX += 0.5;
+                        param.offsetX += param.scale * 0.1;
                         break;
                     
                     case sfKeyRight:
-                        param.offsetX -= 0.5;
+                        param.offsetX -= param.scale * 0.1;
                         break;
 
                     case sfKeyUp:
-                        param.offsetY -= 0.5;
+                        param.offsetY -= param.scale * 0.1;
                         break;
 
                     case sfKeyA:
-                        param.scale += 0.5;
+                        param.scale *= 1.1;
                         break;
                     
                     case sfKeyS:
-                        param.scale -= 0.5;
+                        param.scale *= 0.9;
                         break;
+
+                    case sfKeyH:
+                        param.scale = 2;
+                        param.offsetX = 0;
+                        param.offsetY = 0;
                 }
             }
         }
@@ -97,7 +109,6 @@ int main()
         sfRenderWindow_display(window);
     }
 
-    // Освобождение ресурсов
     sfFont_destroy(font);
     sfText_destroy(text);
     sfVertexArray_destroy(vertex_array);
@@ -108,42 +119,55 @@ int main()
 
 void GetPoint (sfVertexArray* vertex_array, Param* param)
 {
-    for (double x = 0; x < WINDOW_WIDTH; x++)
+    for (float x = 0; x < WINDOW_WIDTH; x++)
+    {
+        for (float y = 0; y < WINDOW_HEIGHT; y++)
         {
-            for (double y = 0; y < WINDOW_HEIGHT; y++)
+            float cx = (x - (WINDOW_WIDTH / 2) ) / (WINDOW_WIDTH / param->scale) - param->offsetX;
+            float cy = (- y + (WINDOW_HEIGHT / 2) ) / (WINDOW_HEIGHT / param->scale) - param->offsetY;
+
+            float z_x = 0.0f, z_x2 = 0.0f,
+            z_y = 0.0f, z_y2 = 0.0f;
+
+            int iterations = 0;
+
+            while (z_x2 + z_y2 < 4 && iterations < 255) 
             {
-                double cx = (x - (WINDOW_WIDTH / 2)) / (WINDOW_WIDTH / param->scale) - param->offsetX;
-                double cy = (- y + (WINDOW_HEIGHT / 2)) / (WINDOW_HEIGHT / param->scale) - param->offsetY;
+                z_y = 2 * z_x * z_y + cy;
+                z_x = z_x2 - z_y2 + cx;
 
-                double z_x = 0.0f, z_x2 = 0.0f,
-                z_y = 0.0f, z_y2 = 0.0f;
+                z_x2 = z_x * z_x;
+                z_y2 = z_y * z_y;
 
-                int iterations = 0;
-
-                while (z_x2 + z_y2 < 4 &&
-                        iterations < 255) 
-                {
-                    z_y = 2 * z_x * z_y + cy;
-                    z_x = z_x2 - z_y2 + cx;
-
-                    z_x2 = z_x * z_x;
-                    z_y2 = z_y * z_y;
-
-                    iterations++;
-                }
-
-                sfVertex vertex;
-
-                const float colorScale = 255.0f / 256;
-                const float iterNormalized = iterations * colorScale;
-                if (iterations >= 255)
-                    vertex.color = sfColor_fromRGB(0, 0, 0);
-                else
-                    vertex.color = sfColor_fromRGB(iterNormalized * 2, iterNormalized * 10 + 2, iterNormalized * 1 + 5);
-
-                vertex.position = (sfVector2f){x, y};
-                sfVertexArray_append(vertex_array, vertex);
+                iterations++;
             }
+
+            sfVertex vertex;
+
+            Color color = {};
+            GetColor (iterations, &color);
+            vertex.color = sfColor_fromRGB(color.red, color.green, color.blue);
+
+            vertex.position = (sfVector2f){x, y};
+            sfVertexArray_append(vertex_array, vertex);
         }
+    }
 }
 
+void GetColor (int iterations, Color* color)
+{
+    const float colorScale = 255.0f / 256;
+    const float iterNormalized = iterations * colorScale;
+    if (iterations >= 255)
+    {
+        color->blue = 0;
+        color->green = 0;
+        color->red = 0;
+    }
+    else
+    {
+        color->red = iterNormalized * 2;
+        color->green = iterNormalized * 10 + 2;
+        color->blue = iterNormalized * 1 + 5;
+    }
+}
