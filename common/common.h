@@ -4,9 +4,8 @@
 #include <SFML/Graphics.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <xmmintrin.h>
-#include <x86intrin.h>
+#include <time.h>
 
 struct Param {
     float offsetX;
@@ -24,7 +23,6 @@ void GetPoint (sfVertexArray* vertex_array, Param* param);
 void GetColor (int iterations, Color* color);
 void GetPoint1 (sfVertexArray* vertex_array, Param* param);
 void GetPoint2 (sfVertexArray* vertex_array, Param* param);
-void GetPoint3 (sfVertexArray* vertex_array, Param* param);
 void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param));
 void tests ();
 

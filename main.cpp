@@ -2,11 +2,11 @@
 
 int main() 
 {
-    tests ();
+    // tests ();
 
-    // draw (GetPoint1);
+    // draw (GetPoint);
     // draw (GetPoint2);
-    // draw (GetPoint2);
+    draw (GetPoint2);
 
 
     return 0;

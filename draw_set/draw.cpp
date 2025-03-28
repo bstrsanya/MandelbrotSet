@@ -13,7 +13,7 @@ void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param))
 
     sfClock* clock = sfClock_create(); 
 
-    sfFont* font = sfFont_createFromFile("1.otf");
+    sfFont* font = sfFont_createFromFile("./draw_set/1.otf");
     
     sfText* text = sfText_create();
     sfText_setFont(text, font); 
@@ -71,7 +71,7 @@ void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param))
 
         sfClock_restart(clock);
 
-        char fpsString[50];
+        char fpsString[20];
         sprintf(fpsString, "FPS: %.1f", fps);
         sfText_setString(text, fpsString);
 

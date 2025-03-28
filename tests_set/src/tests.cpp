@@ -14,7 +14,7 @@ void tests ()
     clock_t t2 = clock ();
 
     double elapsed_time = (double)(t2 - t1) / CLOCKS_PER_SEC;
-    printf("0: %lf seconds\n", elapsed_time / 10);
+    printf("0: FPS: %.2lf \n", 10 / elapsed_time);
 
     t1 = clock ();
     for (int i = 0; i < 10; i++)
@@ -24,7 +24,7 @@ void tests ()
     t2 = clock ();
 
     elapsed_time = (double)(t2 - t1) / CLOCKS_PER_SEC;
-    printf("1: %lf seconds\n", elapsed_time / 10);
+    printf("1: FPS: %.2lf \n", 10 / elapsed_time);
 
     t1 = clock ();
     for (int i = 0; i < 10; i++)
@@ -34,5 +34,5 @@ void tests ()
     t2 = clock ();
 
     elapsed_time = (double)(t2 - t1) / CLOCKS_PER_SEC;
-    printf("2: %lf seconds\n", elapsed_time / 10);
+    printf("2: FPS: %.2lf \n", 10 / elapsed_time);
 }
