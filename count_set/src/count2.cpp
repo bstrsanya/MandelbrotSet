@@ -1,8 +1,10 @@
 #include "common.h"
 #include <immintrin.h>
+#include <string.h>
 
-void GetPoint2 (sfVertexArray* vertex_array, Param* param, Color* array)
+void GetPoint2 (int* vertex_array, Param* param, Color* array)
 {
+    int index = 0;
     float x0 = (0 - (WINDOW_WIDTH  / 2)) / (WINDOW_WIDTH / param->scale) - param->offsetX;
     float y0 = (0 + (WINDOW_HEIGHT / 2)) / (WINDOW_HEIGHT / param->scale) - param->offsetY;
 
@@ -10,7 +12,7 @@ void GetPoint2 (sfVertexArray* vertex_array, Param* param, Color* array)
     float step_y = -1 / (WINDOW_HEIGHT / param->scale);
 
     __m256 max_r2 = _mm256_set1_ps (100);
-    __m256 _0123 = _mm256_set_ps (0, 1, 2, 3, 4, 5, 6, 7);
+    __m256 _0123 = _mm256_set_ps (7,6,5,4,3,2,1,0);
     __m256 delta = _mm256_mul_ps (_mm256_set1_ps (8), _mm256_set1_ps (step_y));
     __m256i active_mask = _mm256_set1_epi32(1); 
     
@@ -49,21 +51,29 @@ void GetPoint2 (sfVertexArray* vertex_array, Param* param, Color* array)
                 m256_y2 = _mm256_mul_ps (m256_y, m256_y);
             }
 
-            for (int j = 0; j < 8; j++)
-            {
-                alignas(32) int iter_values[8];
-                _mm256_store_si256((__m256i*) iter_values, iterations);
+            alignas(32) int iter_values[8];
+            _mm256_store_si256((__m256i*) iter_values, iterations);
+
+            memcpy (&vertex_array[index], iter_values, 8 * sizeof (int));
+
+            // for (int j = 0; j < 8; j++)
+            //     vertex_array[index + j] = iter_values[j];
+
+            index += 8;
+
+
+            // for (int j = 0; j < 8; j++)
+            // {
+            //     int color_index = iter_values[j];
                 
-                int color_index = iter_values[7-j];
-                
-                sfVertex vertex = {
-                    .position = {x_pixel, y_pixel + j},
-                    .color = sfColor_fromRGB(array[color_index].red, 
-                                             array[color_index].green, 
-                                             array[color_index].blue)
-                };
-                sfVertexArray_append(vertex_array, vertex);
-            }
+            //     sfVertex vertex = {
+            //         .position = {x_pixel, y_pixel + j},
+            //         .color = sfColor_fromRGB(array[color_index].red, 
+            //                                  array[color_index].green, 
+            //                                  array[color_index].blue)
+            //     };
+            //     sfVertexArray_append(vertex_array, vertex);
+            // }
 
             m256_y0 = _mm256_add_ps (m256_y0, delta);
         }

@@ -16,8 +16,9 @@ uint64_t get_rdtsc()
 void tests (Color* array)
 {
     Param param = {.offsetX = 0, .offsetY = 0, .scale = 2};
-    sfVertexArray* vertex_array = sfVertexArray_create();
-    sfVertexArray_setPrimitiveType(vertex_array, sfPoints);
+
+    int* vertex_array = (int*) calloc (WINDOW_HEIGHT * WINDOW_WIDTH, sizeof (int));
+    
 
     FILE* fp = fopen("/proc/cpuinfo", "r");
     double cpu_freq = 0;
@@ -39,7 +40,7 @@ void tests (Color* array)
     
     for (int i = 0; i < 100; i++)
     {
-        GetPoint (vertex_array, &param, array);
+        GetPoint2 (vertex_array, &param, array);
     }
     
     uint64_t b = get_rdtsc();
@@ -72,8 +73,8 @@ void tests (Color* array)
 
     // elapsed_time = (double)(t2 - t1) / CLOCKS_PER_SEC;
     // printf("2: FPS: %.2lf \n", 20 / elapsed_time);
+    free (vertex_array);
 
-    sfVertexArray_destroy(vertex_array);
 }
 
 

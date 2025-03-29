@@ -14,8 +14,8 @@ int main()
     //     printf ("%d %d %d\n", array_color[i].red, array_color[i].green, array_color[i].blue);
     // }
 
-    draw (GetPoint, array_color);
-    // tests (array_color);
+    // draw (GetPoint2, array_color);
+    tests (array_color);
 
     free(array_color);
 

@@ -1,6 +1,6 @@
 #include "common.h"
 
-void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param, Color* array), Color* array)
+void draw (void (*GetPoint_func)(int* vertex_array, Param* param, Color* array), Color* array)
 {
     sfRenderWindow* window;
     sfVideoMode mode = {WINDOW_WIDTH, WINDOW_HEIGHT, 8};
@@ -81,7 +81,25 @@ void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param, Colo
 
         sfVertexArray_clear(vertex_array);
 
-        GetPoint_func (vertex_array, &param, array);
+        int* arr = (int*) calloc (WINDOW_HEIGHT * WINDOW_WIDTH, sizeof (int));
+        GetPoint_func (arr, &param, array);
+
+        for (int x = 0; x < WINDOW_WIDTH; x++)
+        {
+            for (int y = 0; y < WINDOW_HEIGHT; y++)
+            {
+                sfVertex vertex = {
+                    .position = {x, y},
+                    .color = sfColor_fromRGB(array[arr[x * WINDOW_HEIGHT + y]].red, 
+                                             array[arr[x * WINDOW_HEIGHT + y]].green, 
+                                             array[arr[x * WINDOW_HEIGHT + y]].blue)
+                };
+                sfVertexArray_append(vertex_array, vertex);
+            }
+        }
+
+        free (arr);
+
 
         sfRenderWindow_drawVertexArray(window, vertex_array, NULL);
         sfRenderWindow_drawText(window, text, NULL);

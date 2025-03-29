@@ -24,8 +24,8 @@ struct Color {
 
 void GetPoint (sfVertexArray* vertex_array, Param* param, Color* array);
 void GetColor (Color* array);
-void GetPoint2 (sfVertexArray* vertex_array, Param* param, Color* array);
-void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param, Color* array), Color* array);
+void GetPoint2 (int* vertex_array, Param* param, Color* array);
+void draw (void (*GetPoint_func)(int* vertex_array, Param* param, Color* array), Color* array);
 void tests (Color* array);
 
 #define WINDOW_WIDTH  1000
