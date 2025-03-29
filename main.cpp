@@ -5,9 +5,19 @@ int main()
     // tests ();
 
     // draw (GetPoint);
-    // draw (GetPoint2);
-    draw (GetPoint2);
 
+    Color* array_color = (Color*) calloc (101, sizeof (Color));
+    GetColor (array_color);
+
+    // for (int i = 0; i < 101; i++)
+    // {
+    //     printf ("%d %d %d\n", array_color[i].red, array_color[i].green, array_color[i].blue);
+    // }
+
+    draw (GetPoint, array_color);
+    // tests (array_color);
+
+    free(array_color);
 
     return 0;
 }

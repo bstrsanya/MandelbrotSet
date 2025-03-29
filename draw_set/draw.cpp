@@ -1,6 +1,6 @@
 #include "common.h"
 
-void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param))
+void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param, Color* array), Color* array)
 {
     sfRenderWindow* window;
     sfVideoMode mode = {WINDOW_WIDTH, WINDOW_HEIGHT, 8};
@@ -81,7 +81,7 @@ void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param))
 
         sfVertexArray_clear(vertex_array);
 
-        GetPoint_func (vertex_array, &param);
+        GetPoint_func (vertex_array, &param, array);
 
         sfRenderWindow_drawVertexArray(window, vertex_array, NULL);
         sfRenderWindow_drawText(window, text, NULL);
@@ -93,4 +93,6 @@ void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param))
     sfText_destroy(text);
     sfVertexArray_destroy(vertex_array);
     sfRenderWindow_destroy(window);
+    sfClock_destroy (clock);
+
 }

@@ -1,6 +1,6 @@
 #include "common.h"
 
-void GetPoint (sfVertexArray* vertex_array, Param* param)
+void GetPoint (sfVertexArray* vertex_array, Param* param, Color* array)
 {
     for (float x_pixel = 0; x_pixel < WINDOW_WIDTH; x_pixel++)
     {
@@ -16,7 +16,7 @@ void GetPoint (sfVertexArray* vertex_array, Param* param)
 
             int iterations = 0;
 
-            while (z_x2 + z_y2 < 4 && iterations < 255) 
+            while (z_x2 + z_y2 < 100 && iterations < 100) 
             {
                 z_y = 2 * z_x * z_y + cy;
                 z_x = z_x2 - z_y2 + cx;
@@ -28,13 +28,14 @@ void GetPoint (sfVertexArray* vertex_array, Param* param)
             }
 
             sfVertex vertex = {};
-            Color color = {};
-            GetColor (iterations, &color);
-            vertex.color = sfColor_fromRGB(color.red, color.green, color.blue);
 
+            vertex.color = sfColor_fromRGB(array[iterations].red, array[iterations].green, array[iterations].blue);
             vertex.position = (sfVector2f){x_pixel, y_pixel};
             sfVertexArray_append(vertex_array, vertex);
         }
     }
 }
 
+// массив цветов и синусы и косинусы
+// наивная сами циклы разварачиваем и интринсики
+// rdtsc

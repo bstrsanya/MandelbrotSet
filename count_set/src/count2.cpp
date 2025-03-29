@@ -1,6 +1,7 @@
 #include "common.h"
+#include <immintrin.h>
 
-void GetPoint2 (sfVertexArray* vertex_array, Param* param)
+void GetPoint2 (sfVertexArray* vertex_array, Param* param, Color* array)
 {
     float x0 = (0 - (WINDOW_WIDTH  / 2)) / (WINDOW_WIDTH / param->scale) - param->offsetX;
     float y0 = (0 + (WINDOW_HEIGHT / 2)) / (WINDOW_HEIGHT / param->scale) - param->offsetY;
@@ -8,62 +9,63 @@ void GetPoint2 (sfVertexArray* vertex_array, Param* param)
     float step_x = 1  / (WINDOW_WIDTH  / param->scale);
     float step_y = -1 / (WINDOW_HEIGHT / param->scale);
 
-    __m128 max_r2 = _mm_set_ps1 (4);
-    __m128 _0123 = _mm_set_ps (0, 1, 2, 3);
-    __m128 delta = _mm_mul_ps (_mm_set_ps1 (4), _mm_set_ps1 (step_y));
+    __m256 max_r2 = _mm256_set1_ps (100);
+    __m256 _0123 = _mm256_set_ps (0, 1, 2, 3, 4, 5, 6, 7);
+    __m256 delta = _mm256_mul_ps (_mm256_set1_ps (8), _mm256_set1_ps (step_y));
+    __m256i active_mask = _mm256_set1_epi32(1); 
     
     for (float x_pixel = 0; x_pixel < WINDOW_WIDTH; x_pixel += 1)
     {
-        __m128 m128_x0 = _mm_set_ps1 (x0);
-        __m128 m128_y0 = _mm_add_ps (_mm_set_ps1 (y0), _mm_mul_ps (_0123, _mm_set_ps1 (step_y)));
+        __m256 m256_x0 = _mm256_set1_ps (x0);
+        __m256 m256_y0 = _mm256_add_ps (_mm256_set1_ps (y0), _mm256_mul_ps (_0123, _mm256_set1_ps (step_y)));
 
-        for (float y_pixel = 0; y_pixel < WINDOW_HEIGHT; y_pixel += 4)
+        for (float y_pixel = 0; y_pixel < WINDOW_HEIGHT; y_pixel += 8)
         {
-            __m128 m128_x  = _mm_setzero_ps();
-            __m128 m128_x2 = _mm_setzero_ps();
-            __m128 m128_y  = _mm_setzero_ps();
-            __m128 m128_y2 = _mm_setzero_ps();
-            
-            __m128 active_mask = _mm_set_ps1(1.0f);
-            __m128 iterations = _mm_setzero_ps();
+            __m256 m256_x  = _mm256_setzero_ps();
+            __m256 m256_x2 = _mm256_setzero_ps();
+            __m256 m256_y  = _mm256_setzero_ps();
+            __m256 m256_y2 = _mm256_setzero_ps();
 
-            int i = 0;
-            while (i < 255) 
+            __m256i iterations = _mm256_setzero_si256();
+
+            for (int i = 0; i < 100; i++)
             {
-                __m128 r2 = _mm_add_ps (m128_x2, m128_y2);
-                __m128 cmp = _mm_cmple_ps (r2, max_r2);
-                int mask = _mm_movemask_ps (cmp);
+                __m256 r2 = _mm256_add_ps (m256_x2, m256_y2);
+                __m256 cmp = _mm256_cmp_ps (r2, max_r2, _CMP_LE_OQ);
+                int mask = _mm256_movemask_ps (cmp);
                 if (!mask)
                     break;
                    
-                __m128 still_active = _mm_and_ps(cmp, active_mask);
-                iterations = _mm_add_ps(iterations, still_active);
-                active_mask = still_active;
-                
-                m128_y = _mm_mul_ps (m128_x, m128_y);
-                m128_y = _mm_add_ps (m128_y, m128_y);
-                m128_y = _mm_add_ps (m128_y, m128_y0);
+                iterations = _mm256_add_epi32(iterations, _mm256_and_si256(_mm256_castps_si256(cmp), active_mask));
 
-                m128_x = _mm_sub_ps (m128_x2, m128_y2);
-                m128_x = _mm_add_ps (m128_x, m128_x0);
+                m256_y = _mm256_mul_ps (m256_x, m256_y);
+                m256_y = _mm256_add_ps (m256_y, m256_y);
+                m256_y = _mm256_add_ps (m256_y, m256_y0);
 
-                m128_x2 = _mm_mul_ps (m128_x, m128_x);
-                m128_y2 = _mm_mul_ps (m128_y, m128_y);
+                m256_x = _mm256_sub_ps (m256_x2, m256_y2);
+                m256_x = _mm256_add_ps (m256_x, m256_x0);
 
-                i++;
+                m256_x2 = _mm256_mul_ps (m256_x, m256_x);
+                m256_y2 = _mm256_mul_ps (m256_y, m256_y);
             }
 
-            for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 8; j++)
             {
-                sfVertex vertex = {};
-                Color color = {};
-                GetColor(iterations[3-i], &color);
-                vertex.color = sfColor_fromRGB(color.red, color.green, color.blue);
-                vertex.position = (sfVector2f){x_pixel, y_pixel + i};
+                alignas(32) int iter_values[8];
+                _mm256_store_si256((__m256i*) iter_values, iterations);
+                
+                int color_index = iter_values[7-j];
+                
+                sfVertex vertex = {
+                    .position = {x_pixel, y_pixel + j},
+                    .color = sfColor_fromRGB(array[color_index].red, 
+                                             array[color_index].green, 
+                                             array[color_index].blue)
+                };
                 sfVertexArray_append(vertex_array, vertex);
             }
 
-            m128_y0 = _mm_add_ps (m128_y0, delta);
+            m256_y0 = _mm256_add_ps (m256_y0, delta);
         }
         x0 = x0 + step_x;
     }

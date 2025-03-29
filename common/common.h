@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <xmmintrin.h>
 #include <time.h>
+#include <emmintrin.h>
+#include <immintrin.h>
+#include <x86intrin.h>  
 
 struct Param {
     float offsetX;
@@ -19,14 +22,16 @@ struct Color {
     char blue;
 };
 
-void GetPoint (sfVertexArray* vertex_array, Param* param);
-void GetColor (int iterations, Color* color);
-void GetPoint1 (sfVertexArray* vertex_array, Param* param);
-void GetPoint2 (sfVertexArray* vertex_array, Param* param);
-void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param));
-void tests ();
+void GetPoint (sfVertexArray* vertex_array, Param* param, Color* array);
+void GetColor (Color* array);
+void GetPoint2 (sfVertexArray* vertex_array, Param* param, Color* array);
+void draw (void (*GetPoint_func)(sfVertexArray* vertex_array, Param* param, Color* array), Color* array);
+void tests (Color* array);
 
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
+
+
+
 
 #endif // COMMON_H
