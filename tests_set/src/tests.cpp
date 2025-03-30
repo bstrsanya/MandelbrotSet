@@ -2,18 +2,38 @@
 
 void tests ()
 {
-    Param param = {.offsetX = 0, .offsetY = 0, .scale = 2};
+    Param param = {.offsetX = INIT_SHIFT, .offsetY = INIT_SHIFT, .scale = INIT_SCALE};
     int* vertex_array = (int*) calloc (WINDOW_HEIGHT * WINDOW_WIDTH, sizeof (int));
 
     uint64_t begin = get_rdtsc();
     
-    for (int i = 0; i < 10; i++)
-        GetPoint2 (vertex_array, &param);
+    for (int i = 0; i < SIZE_TEST; i++)
+        GetPoint1 (vertex_array, &param);
     
     uint64_t end = get_rdtsc();
 
-    double fps = 10.0 / ((double)(end - begin) / cpu_freq);
-    printf("FPS: %lf\n", fps);
+    double fps = (SIZE_TEST * 1.0f) / ((double)(end - begin) / cpu_freq);
+    printf("(1 type) FPS: %lf\n", fps);
+
+    begin = get_rdtsc();
+    
+    for (int i = 0; i < SIZE_TEST; i++)
+        GetPoint2 (vertex_array, &param);
+    
+    end = get_rdtsc();
+
+    fps = (SIZE_TEST * 1.0f) / ((double)(end - begin) / cpu_freq);
+    printf("(2 type) FPS: %lf\n", fps);
+
+    begin = get_rdtsc();
+    
+    for (int i = 0; i < SIZE_TEST; i++)
+        GetPoint3 (vertex_array, &param);
+    
+    end = get_rdtsc();
+
+    fps = (SIZE_TEST * 1.0f) / ((double)(end - begin) / cpu_freq);
+    printf("(3 type) FPS: %lf\n", fps);
 
     free (vertex_array);
 

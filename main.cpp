@@ -1,21 +1,28 @@
 #include "common.h"
 
-int main() 
+int main(int argc, char** argv) 
 {
-    // tests ();
+    if (argc != 2)
+    {
+        printf ("Enter 1 command line argument\n");
+        return 0;
+    }
 
-    // draw (GetPoint);
-
+    if (!strcmp (argv[1], "tests"))
+        tests ();
     
-
-    // for (int i = 0; i < 101; i++)
-    // {
-    //     printf ("%d %d %d\n", array_color[i].red, array_color[i].green, array_color[i].blue);
-    // }
-
-    // draw (GetPoint2);
-    tests ();
-
+    else if (!strcmp (argv[1], "draw_type1"))
+        draw (GetPoint1);
+    
+    else if (!strcmp (argv[1], "draw_type2"))
+        draw (GetPoint2);
+    
+    else if (!strcmp (argv[1], "draw_type3"))
+        draw (GetPoint3);
+    else
+    {
+        printf ("Correct arg: [tests], [draw_type1], [draw_type2], [draw_type3]\n");
+    }
 
     return 0;
 }

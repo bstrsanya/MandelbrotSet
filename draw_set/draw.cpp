@@ -3,25 +3,25 @@
 void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
 {
     sfRenderWindow* window;
-    sfVideoMode mode = {WINDOW_WIDTH, WINDOW_HEIGHT, 8};
-    window = sfRenderWindow_create(mode, "Mandelbrot", sfClose, NULL);
+    sfVideoMode mode = {WINDOW_WIDTH, WINDOW_HEIGHT, DEEP_COLOR};
+    window = sfRenderWindow_create(mode, NAME_WINDOW, sfClose, NULL);
 
     sfVertexArray* vertex_array = sfVertexArray_create();
     sfVertexArray_setPrimitiveType(vertex_array, sfPoints);
 
-    Param param = {.offsetX = 0, .offsetY = 0, .scale = 2};
+    Param param = {.offsetX = INIT_SHIFT, .offsetY = INIT_SHIFT, .scale = INIT_SCALE};
 
-    sfClock* clock = sfClock_create(); 
-
-    sfFont* font = sfFont_createFromFile("./draw_set/1.otf");
-    
+    sfFont* font = sfFont_createFromFile(WAY_FONT);
     sfText* text = sfText_create();
     sfText_setFont(text, font); 
-    sfText_setCharacterSize(text, 30); 
+    sfText_setCharacterSize(text, SIZE_BUF_TEXT); 
     sfText_setColor(text, sfBlue);  
 
-    Color* array = (Color*) calloc (MAX_NUM_ITER + 1, sizeof (Color));
-    GetColor (array);
+    Color* array_color = (Color*) calloc (MAX_NUM_ITER + 1, sizeof (Color));
+    GetColor (array_color);
+
+    uint64_t t1 = get_rdtsc();
+    uint64_t t2 = 0;
 
     while (sfRenderWindow_isOpen(window)) 
     {
@@ -36,33 +36,33 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
                 switch ((int) event.key.code)
                 {
                     case sfKeyDown:
-                        param.offsetY += param.scale * 0.1f;
+                        param.offsetY += param.scale * COEF_SHIFT;
                         break;
 
                     case sfKeyLeft:
-                        param.offsetX += param.scale * 0.1f;
+                        param.offsetX += param.scale * COEF_SHIFT;
                         break;
                     
                     case sfKeyRight:
-                        param.offsetX -= param.scale * 0.1f;
+                        param.offsetX -= param.scale * COEF_SHIFT;
                         break;
 
                     case sfKeyUp:
-                        param.offsetY -= param.scale * 0.1f;
+                        param.offsetY -= param.scale * COEF_SHIFT;
                         break;
 
                     case sfKeyA:
-                        param.scale *= 1.1f;
+                        param.scale *= ZOOM_IN;
                         break;
                     
                     case sfKeyS:
-                        param.scale *= 0.9f;
+                        param.scale *= ZOOM_OUT;
                         break;
 
                     case sfKeyH:
-                        param.scale = 2.0f;
-                        param.offsetX = 0.0f;
-                        param.offsetY = 0.0f;
+                        param.scale   = INIT_SCALE;
+                        param.offsetX = INIT_SHIFT;
+                        param.offsetY = INIT_SHIFT;
 
                     default:
                         break;
@@ -70,14 +70,12 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
             }
         }
 
-        sfTime deltaTime = sfClock_getElapsedTime(clock);
-        float deltaTimeSeconds = sfTime_asSeconds(deltaTime);
+        t2 = get_rdtsc ();
+        
+        float fps = 1.0f / ((float)(t2 - t1) / cpu_freq);
+        t1 = t2;
 
-        float fps = 1.0f / deltaTimeSeconds;
-
-        sfClock_restart(clock);
-
-        char fpsString[20];
+        char fpsString[SIZE_BUF_TEXT];
         sprintf(fpsString, "FPS: %.1f", fps);
         sfText_setString(text, fpsString);
 
@@ -87,24 +85,26 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
 
         sfVertexArray_clear(vertex_array);
 
-        int* arr = (int*) calloc (WINDOW_HEIGHT * WINDOW_WIDTH, sizeof (int));
-        GetPoint_func (arr, &param);
+        int* cur_value_color = (int*) calloc (WINDOW_HEIGHT * WINDOW_WIDTH, sizeof (int));
+        GetPoint_func (cur_value_color, &param);
 
         for (int x = 0; x < WINDOW_WIDTH; x++)
         {
             for (int y = 0; y < WINDOW_HEIGHT; y++)
             {
-                sfVertex vertex = {
+                Color value_color = array_color[cur_value_color[x * WINDOW_HEIGHT + y]];
+
+                sfVertex vertex = 
+                {
                     .position = {(float) x, (float) y},
-                    .color = sfColor_fromRGB(array[arr[x * WINDOW_HEIGHT + y]].red, 
-                                             array[arr[x * WINDOW_HEIGHT + y]].green, 
-                                             array[arr[x * WINDOW_HEIGHT + y]].blue)
+                    .color = sfColor_fromRGB(value_color.red, 
+                                             value_color.green, 
+                                             value_color.blue)
                 };
                 sfVertexArray_append(vertex_array, vertex);
             }
         }
-
-        free (arr);
+        free (cur_value_color);
 
 
         sfRenderWindow_drawVertexArray(window, vertex_array, NULL);
@@ -117,6 +117,5 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
     sfText_destroy(text);
     sfVertexArray_destroy(vertex_array);
     sfRenderWindow_destroy(window);
-    sfClock_destroy (clock);
-    free(array);
+    free(array_color);
 }

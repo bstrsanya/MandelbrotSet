@@ -9,7 +9,7 @@ void GetColor (Color* array)
         array[t].blue  = (unsigned char) (((int) round ((0.5 + 0.45 * sin (14 * t - 1.5)) * 255)) % 256);
     }
 
-    array[MAX_NUM_ITER].red = 0;
+    array[MAX_NUM_ITER].red   = 0;
     array[MAX_NUM_ITER].green = 0;
-    array[MAX_NUM_ITER].blue = 0;
+    array[MAX_NUM_ITER].blue  = 0;
 }
