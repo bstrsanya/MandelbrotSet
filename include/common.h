@@ -5,9 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <xmmintrin.h>
-#include <emmintrin.h>
 #include <immintrin.h>
-#include <x86intrin.h>  
 #include <cstdint>
 #include <math.h>
 #include <string.h>
@@ -24,12 +22,11 @@ struct Color {
     unsigned char blue;
 };
 
-void GetPoint1  (int* vertex_array, Param* param);
+void GetPoint1 (int* vertex_array, Param* param);
 void GetPoint2 (int* vertex_array, Param* param);
 void GetPoint3 (int* vertex_array, Param* param);
 
 void GetColor  (Color* array);
-
 
 void draw (void (*GetPoint_func)(int* vertex_array, Param* param));
 uint64_t get_rdtsc();
@@ -50,7 +47,22 @@ const float INIT_SHIFT = 0.0f;
 const size_t SIZE_BUF_TEXT = 30;
 const int DEEP_COLOR = 8;
 const int SIZE_TEST = 10;
-constexpr const char* WAY_FONT = "./draw_set/1.otf";
+const int SIZE_PIXEL = 4;
+const int OPAQUE = 255;
+constexpr const char* WAY_FONT = "./font/1.otf";
 constexpr const char* NAME_WINDOW = "Mandelbrot";
+
+const float SHIFT_COLOR = 0.5f;
+const float RED_A = 0.35f;
+const float RED_B = 15.0f;
+const float RED_C = 1.6f;
+const float GREEN_A = 0.55f;
+const float GREEN_B = 13.0f;
+const float GREEN_C = 0.4f;
+const float BLUE_A = 0.45f;
+const float BLUE_B = 14.0f;
+const float BLUE_C = -1.5f;
+const int MAX_COLOR = 255;
+const int NORMAL_CHAR = 256;
 
 #endif // COMMON_H

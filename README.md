@@ -1,13 +1,24 @@
 # Mandelbrot_Set
 
+## Installation
+```
+sudo dnf install CSFML
+```
 ## Program launch
 ```
-make -f Makefile
+make
 ./main <arg>
 ```
 ```
 arg = tests | draw_type1 | draw_type2 | draw_type3
 ```
+**tests** - run only test calculations
+
+**draw_type1** - first version graphics window
+
+**draw_type2** - second version graphics window
+
+**draw_type3** - third version graphics window
 
 ## Description
 
@@ -109,17 +120,17 @@ Below are the FPS (frame per second) for all program variations.
 Optimization with flag **$-O0$**
 | Version | With rendering | Just calculation | 
 | :-----: | :------------: | :-------: |
-| 1       |       7.7      |   8.4     |
-| 2       |       2.1      |   2.7     |
-| 3       |       7.4      |   19.9    |
+| 1       |       8.1      |   8.8     |
+| 2       |       2.4      |   2.9     |
+| 3       |       18.7     |   20.9    |
 
 Optimization with flag **$-O3$** 
 
 | Version | With rendering | Just calculation | 
 | :-----: | :------------: | :-------: |
-| 1       |        17.7    |      19.4 |
-| 2       |        28.3    |      37.0 |
-| 3       |        63.1    |      118.3|
+| 1       |        18.7    |      19.9 |
+| 2       |        35.9    |      39.6 |
+| 3       |        98.8    |      121.3|
 
 When calling the **draw** function, the FPS is shown taking into account rendering, and when calling the **tests** function, without it.
 

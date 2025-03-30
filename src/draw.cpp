@@ -6,8 +6,10 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
     sfVideoMode mode = {WINDOW_WIDTH, WINDOW_HEIGHT, DEEP_COLOR};
     window = sfRenderWindow_create(mode, NAME_WINDOW, sfClose, NULL);
 
-    sfVertexArray* vertex_array = sfVertexArray_create();
-    sfVertexArray_setPrimitiveType(vertex_array, sfPoints);
+    sfSprite* sprite = sfSprite_create();
+    sfTexture* texture = sfTexture_create (WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    sfUint8* pixels = (sfUint8*) calloc (SIZE_PIXEL * WINDOW_WIDTH * WINDOW_HEIGHT, sizeof(sfUint8)); 
 
     Param param = {.offsetX = INIT_SHIFT, .offsetY = INIT_SHIFT, .scale = INIT_SCALE};
 
@@ -83,8 +85,6 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
 
         sfRenderWindow_clear(window, sfBlack);
 
-        sfVertexArray_clear(vertex_array);
-
         int* cur_value_color = (int*) calloc (WINDOW_HEIGHT * WINDOW_WIDTH, sizeof (int));
         GetPoint_func (cur_value_color, &param);
 
@@ -93,21 +93,19 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
             for (int y = 0; y < WINDOW_HEIGHT; y++)
             {
                 Color value_color = array_color[cur_value_color[x * WINDOW_HEIGHT + y]];
-
-                sfVertex vertex = 
-                {
-                    .position = {(float) x, (float) y},
-                    .color = sfColor_fromRGB(value_color.red, 
-                                             value_color.green, 
-                                             value_color.blue)
-                };
-                sfVertexArray_append(vertex_array, vertex);
+                int index = (y * WINDOW_WIDTH + x) * SIZE_PIXEL;  
+                pixels[index]     = value_color.red;       
+                pixels[index + 1] = value_color.green; 
+                pixels[index + 2] = value_color.blue;  
+                pixels[index + 3] = OPAQUE;  
             }
         }
+        sfTexture_updateFromPixels(texture, pixels, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);        
         free (cur_value_color);
 
+        sfSprite_setTexture(sprite, texture, sfTrue);
+        sfRenderWindow_drawSprite(window, sprite, NULL);
 
-        sfRenderWindow_drawVertexArray(window, vertex_array, NULL);
         sfRenderWindow_drawText(window, text, NULL);
 
         sfRenderWindow_display(window);
@@ -115,7 +113,23 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
 
     sfFont_destroy(font);
     sfText_destroy(text);
-    sfVertexArray_destroy(vertex_array);
+    sfSprite_destroy (sprite);
+    sfTexture_destroy (texture);
     sfRenderWindow_destroy(window);
     free(array_color);
+    free (pixels);
+}
+
+void GetColor (Color* array)
+{
+    for (int t = 0; t < MAX_NUM_ITER; t++)
+    {
+        array[t].red  =  (unsigned char) (((int) round ((SHIFT_COLOR + RED_A   * sin (RED_B   * (float) t + RED_C  )) * MAX_COLOR)) % NORMAL_CHAR);
+        array[t].green = (unsigned char) (((int) round ((SHIFT_COLOR + GREEN_A * sin (GREEN_B * (float) t + GREEN_C)) * MAX_COLOR)) % NORMAL_CHAR);
+        array[t].blue  = (unsigned char) (((int) round ((SHIFT_COLOR + BLUE_A  * sin (BLUE_B  * (float) t + BLUE_C )) * MAX_COLOR)) % NORMAL_CHAR);
+    }
+
+    array[MAX_NUM_ITER].red   = 0;
+    array[MAX_NUM_ITER].green = 0;
+    array[MAX_NUM_ITER].blue  = 0;
 }
