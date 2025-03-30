@@ -1,4 +1,4 @@
-# Mandelbrot_Set
+# MandelbrotSet
 
 ## Installation
 ```
