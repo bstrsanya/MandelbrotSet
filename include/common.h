@@ -26,7 +26,7 @@ void GetPoint1 (int* vertex_array, Param* param);
 void GetPoint2 (int* vertex_array, Param* param);
 void GetPoint3 (int* vertex_array, Param* param);
 
-void GetColor  (Color* array);
+void GetColor (uint32_t* array);
 
 void draw (void (*GetPoint_func)(int* vertex_array, Param* param));
 uint64_t get_rdtsc();
@@ -64,5 +64,9 @@ const float BLUE_B = 14.0f;
 const float BLUE_C = -1.5f;
 const int MAX_COLOR = 255;
 const int NORMAL_CHAR = 256;
+
+const int SHIFT_24 = 24;
+const int SHIFT_16 = 16;
+const int SHIFT_8  = 8;
 
 #endif // COMMON_H

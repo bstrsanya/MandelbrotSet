@@ -1,6 +1,6 @@
 #include "common.h"
 
-void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
+void draw (void (*GetPointFunc)(int* vertex_array, Param* param))
 {
     sfRenderWindow* window;
     sfVideoMode mode = {WINDOW_WIDTH, WINDOW_HEIGHT, DEEP_COLOR};
@@ -9,7 +9,7 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
     sfSprite* sprite = sfSprite_create();
     sfTexture* texture = sfTexture_create (WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    sfUint8* pixels = (sfUint8*) calloc (SIZE_PIXEL * WINDOW_WIDTH * WINDOW_HEIGHT, sizeof(sfUint8)); 
+    sfUint32* pixels = (sfUint32*) calloc (WINDOW_WIDTH * WINDOW_HEIGHT, sizeof(sfUint32)); 
 
     Param param = {.offsetX = INIT_SHIFT, .offsetY = INIT_SHIFT, .scale = INIT_SCALE};
 
@@ -19,7 +19,7 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
     sfText_setCharacterSize(text, SIZE_BUF_TEXT); 
     sfText_setColor(text, sfBlue);  
 
-    Color* array_color = (Color*) calloc (MAX_NUM_ITER + 1, sizeof (Color));
+    uint32_t* array_color = (uint32_t*) calloc (MAX_NUM_ITER + 1, sizeof (uint32_t));
     GetColor (array_color);
 
     uint64_t t1 = get_rdtsc();
@@ -86,21 +86,19 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
         sfRenderWindow_clear(window, sfBlack);
 
         int* cur_value_color = (int*) calloc (WINDOW_HEIGHT * WINDOW_WIDTH, sizeof (int));
-        GetPoint_func (cur_value_color, &param);
+        GetPointFunc (cur_value_color, &param);
 
-        for (int x = 0; x < WINDOW_WIDTH; x++)
+        for (int y = 0; y < WINDOW_HEIGHT; y++) 
         {
-            for (int y = 0; y < WINDOW_HEIGHT; y++)
+            uint32_t* cur_pixel = &pixels[y * WINDOW_WIDTH];
+
+            for (int x = 0; x < WINDOW_WIDTH; x++) 
             {
-                Color value_color = array_color[cur_value_color[x * WINDOW_HEIGHT + y]];
-                int index = (y * WINDOW_WIDTH + x) * SIZE_PIXEL;  
-                pixels[index]     = value_color.red;       
-                pixels[index + 1] = value_color.green; 
-                pixels[index + 2] = value_color.blue;  
-                pixels[index + 3] = OPAQUE;  
+                cur_pixel[x] = array_color[cur_value_color[x * WINDOW_HEIGHT + y]];
             }
         }
-        sfTexture_updateFromPixels(texture, pixels, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);        
+
+        sfTexture_updateFromPixels(texture, (const sfUint8*) pixels, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);        
         free (cur_value_color);
 
         sfSprite_setTexture(sprite, texture, sfTrue);
@@ -120,16 +118,19 @@ void draw (void (*GetPoint_func)(int* vertex_array, Param* param))
     free (pixels);
 }
 
-void GetColor (Color* array)
+void GetColor (uint32_t* array)
 {
+    uint32_t red = 0;
+    uint32_t green = 0;
+    uint32_t blue = 0;
+
+    array[MAX_NUM_ITER] = (OPAQUE << SHIFT_24) | (red) | (green << SHIFT_8) | (blue << SHIFT_16);
+
     for (int t = 0; t < MAX_NUM_ITER; t++)
     {
-        array[t].red  =  (unsigned char) (((int) round ((SHIFT_COLOR + RED_A   * sin (RED_B   * (float) t + RED_C  )) * MAX_COLOR)) % NORMAL_CHAR);
-        array[t].green = (unsigned char) (((int) round ((SHIFT_COLOR + GREEN_A * sin (GREEN_B * (float) t + GREEN_C)) * MAX_COLOR)) % NORMAL_CHAR);
-        array[t].blue  = (unsigned char) (((int) round ((SHIFT_COLOR + BLUE_A  * sin (BLUE_B  * (float) t + BLUE_C )) * MAX_COLOR)) % NORMAL_CHAR);
+        red  =  (unsigned char) (((int) round ((SHIFT_COLOR + RED_A   * sin (RED_B   * (float) t + RED_C  )) * MAX_COLOR)) % NORMAL_CHAR);
+        green = (unsigned char) (((int) round ((SHIFT_COLOR + GREEN_A * sin (GREEN_B * (float) t + GREEN_C)) * MAX_COLOR)) % NORMAL_CHAR);
+        blue  = (unsigned char) (((int) round ((SHIFT_COLOR + BLUE_A  * sin (BLUE_B  * (float) t + BLUE_C )) * MAX_COLOR)) % NORMAL_CHAR);
+        array[t] = (OPAQUE << SHIFT_24) | (red) | (green << SHIFT_8) | (blue << SHIFT_16);
     }
-
-    array[MAX_NUM_ITER].red   = 0;
-    array[MAX_NUM_ITER].green = 0;
-    array[MAX_NUM_ITER].blue  = 0;
 }

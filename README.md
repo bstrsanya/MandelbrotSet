@@ -130,7 +130,7 @@ Optimization with flag **$-O3$**
 | :-----: | :------------: | :-------: |
 | 1       |        18.7    |      19.9 |
 | 2       |        35.9    |      39.6 |
-| 3       |        98.8    |      121.3|
+| 3       |        109.1    |      121.3|
 
 When calling the **draw** function, the FPS is shown taking into account rendering, and when calling the **tests** function, without it.
 
