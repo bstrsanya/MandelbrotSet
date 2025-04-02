@@ -10,8 +10,11 @@ make [OPTIONS]
 ./main <arg>
 ```
 ```
-[OPTIONS] = debug=true   // to run the program in debug mode
-          = CFLAGS=-O0   // with optimization -O0, default -O3
+[OPTIONS] = debug=true       // to run the program in debug mode
+          = CFLAGS=-O0       // with optimization -O0, default -O3
+          = compile_commands // get file compile_commands.json
+          = install          // install project in /usr/local/bin
+          = clean            // delete binary file
 ```
 ```
 arg = tests | draw_type1 | draw_type2 | draw_type3
@@ -143,5 +146,3 @@ When calling the **draw** function, the FPS is shown taking into account renderi
 Intel(R) Core(TM) Ultra 7 155H
 
 CPU average MHz: 4000
-
-

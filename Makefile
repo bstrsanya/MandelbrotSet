@@ -23,6 +23,7 @@ INTRINSIC = -msse4.1 -msse4.2 -mavx2 -mavx
 CFLAGS ?= -O3
 OUT_O_DIR ?= build
 COMMONINC = -I./include
+INSTALL_DIR = /usr/local/bin
 
 override CFLAGS += $(COMMONINC)
 override CFLAGS += $(INTRINSIC)
@@ -37,9 +38,9 @@ COBJ = $(addprefix $(OUT_O_DIR)/,$(CSRC:.cpp=.o))
 DEPS = $(COBJ:.o=.d)
 
 .PHONY: all
-all: main
+all: mandelbrot
 
-main: $(COBJ)
+mandelbrot: $(COBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 $(COBJ) : $(OUT_O_DIR)/%.o : %.cpp
@@ -50,9 +51,17 @@ $(DEPS) : $(OUT_O_DIR)/%.d : %.cpp
 	@mkdir -p $(@D)
 	$(CC) -E $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
 
+.PHONY: compile_commands
+compile_commands:
+	bear -- make
+
+.PHONY: install 
+install: 
+	@sudo install -m 755 mandelbrot $(INSTALL_DIR)
+
 .PHONY: clean
 clean:
-	rm -rf ./build main
+	rm -rf ./build mandelbrot
 
 # если вызванная цель НЕ clean то проверить изменения в хедэрах
 NODEPS = clean
