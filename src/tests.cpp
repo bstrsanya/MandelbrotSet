@@ -25,7 +25,7 @@ void tests ()
     fps = (SIZE_TEST * 1.0f) / ((double)(end - begin) / cpu_freq);
     printf("(2 type) FPS: %lf\n", fps);
 
-    begin = get_rdtsc();
+    begin = __rdtsc();
     
     for (int i = 0; i < SIZE_TEST; i++)
         GetPoint3 (vertex_array, &param);

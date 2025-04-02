@@ -1,5 +1,3 @@
-CC = gcc
-
 DEBUG_FLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations \
 		-Wc++14-compat -Wmissing-declarations -Wcast-align -Wcast-qual -Wchar-subscripts \
 		-Wconditionally-supported -Wconversion -Wctor-dtor-privacy -Wempty-body -Wfloat-equal \
@@ -14,33 +12,50 @@ DEBUG_FLAGS = -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressiv
 		-fno-omit-frame-pointer -pie -fPIE -Werror=vla \
 		-fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 
-LINK_FLAGS = -lcsfml-graphics -lcsfml-system -lcsfml-window -lm
+## CC ?= g++ не работает, потому что берется default value CC := cc
+ifeq ($(origin CC),default)
+	CC = g++
+endif 
 
+LDFLAGS = -lcsfml-graphics -lcsfml-system -lcsfml-window -lm
 INTRINSIC = -msse4.1 -msse4.2 -mavx2 -mavx
 
-OPTIMIZATIONS = -O3
+CFLAGS ?= -O3
+OUT_O_DIR ?= build
+COMMONINC = -I./include
 
-II = -I ./include
+override CFLAGS += $(COMMONINC)
+override CFLAGS += $(INTRINSIC)
 
-all: directory mandelbrot
+ifeq ($(debug), true)
+    override CFLAGS += $(DEBUG_FLAGS) 
+    override LDFLAGS += $(DEBUG_FLAGS)        
+endif
 
-directory:
-	@mkdir -p obj
+CSRC =  src/main.cpp src/count_pixel.cpp src/draw.cpp src/tests.cpp
+COBJ = $(addprefix $(OUT_O_DIR)/,$(CSRC:.cpp=.o))
+DEPS = $(COBJ:.o=.d)
 
-mandelbrot: ./obj/main.o ./obj/draw.o ./obj/count_pixel.o ./obj/tests.o
-	$(CC) $(II) ./obj/main.o ./obj/draw.o ./obj/count_pixel.o ./obj/tests.o -o main $(LINK_FLAGS)
+.PHONY: all
+all: main
 
-./obj/main.o: ./main.cpp
-	$(CC) $(II) -c ./main.cpp -o ./obj/main.o $(OPTIMIZATIONS)
+main: $(COBJ)
+	$(CC) $^ -o $@ $(LDFLAGS)
 
-./obj/draw.o: ./src/draw.cpp
-	$(CC) $(II) -c ./src/draw.cpp -o ./obj/draw.o $(OPTIMIZATIONS)
+$(COBJ) : $(OUT_O_DIR)/%.o : %.cpp
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-./obj/tests.o: ./src/tests.cpp
-	$(CC) $(II) -c ./src/tests.cpp -o ./obj/tests.o $(OPTIMIZATIONS)
+$(DEPS) : $(OUT_O_DIR)/%.d : %.cpp
+	@mkdir -p $(@D)
+	$(CC) -E $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
 
-./obj/count_pixel.o: ./src/count_pixel.cpp
-	$(CC) $(II) -c ./src/count_pixel.cpp -o ./obj/count_pixel.o $(INTRINSIC) $(OPTIMIZATIONS)
-
+.PHONY: clean
 clean:
-	rm -rf ./obj main
+	rm -rf ./build main
+
+# если вызванная цель НЕ clean то проверить изменения в хедэрах
+NODEPS = clean
+ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
+include $(DEPS)
+endif

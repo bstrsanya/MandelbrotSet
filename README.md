@@ -2,12 +2,16 @@
 
 ## Installation
 ```
-sudo dnf install CSFML
+sudo apt install CSFML
 ```
 ## Program launch
 ```
-make
+make [OPTIONS]
 ./main <arg>
+```
+```
+[OPTIONS] = debug=true   // to run the program in debug mode
+          = CFLAGS=-O0   // with optimization -O0, default -O3
 ```
 ```
 arg = tests | draw_type1 | draw_type2 | draw_type3
