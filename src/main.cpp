@@ -1,6 +1,6 @@
 #include "common.h"
 
-int main(int argc, char** argv) 
+int main (int argc, char** argv)
 {
     if (argc != 2)
     {
@@ -10,13 +10,13 @@ int main(int argc, char** argv)
 
     if (!strcmp (argv[1], "tests"))
         tests ();
-    
+
     else if (!strcmp (argv[1], "draw_type1"))
         draw (GetPoint1);
-    
+
     else if (!strcmp (argv[1], "draw_type2"))
         draw (GetPoint2);
-    
+
     else if (!strcmp (argv[1], "draw_type3"))
         draw (GetPoint3);
     else
