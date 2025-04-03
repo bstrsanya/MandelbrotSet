@@ -1,20 +1,21 @@
 # MandelbrotSet
 
-## Installation
+## Installing
 ```
 sudo apt install CSFML
-```
-## Program launch
-```
+git clone https://github.com/bstrsanya/MandelbrotSet.git
 make [OPTIONS]
-./main <arg>
+make install
 ```
 ```
 [OPTIONS] = debug=true       // to run the program in debug mode
           = CFLAGS=-O0       // with optimization -O0, default -O3
           = compile_commands // get file compile_commands.json
-          = install          // install project in /usr/local/bin
           = clean            // delete binary file
+```
+## Starting
+```
+mandelbrot <arg>
 ```
 ```
 arg = tests | draw_type1 | draw_type2 | draw_type3

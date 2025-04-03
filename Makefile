@@ -33,7 +33,7 @@ ifeq ($(debug), true)
     override LDFLAGS += $(DEBUG_FLAGS)        
 endif
 
-CSRC =  src/main.cpp src/count_pixel.cpp src/draw.cpp src/tests.cpp
+CSRC = src/main.cpp src/count_pixel.cpp src/draw.cpp src/tests.cpp
 COBJ = $(addprefix $(OUT_O_DIR)/,$(CSRC:.cpp=.o))
 DEPS = $(COBJ:.o=.d)
 
@@ -41,19 +41,21 @@ DEPS = $(COBJ:.o=.d)
 all: mandelbrot
 
 mandelbrot: $(COBJ)
-	$(CC) $^ -o $@ $(LDFLAGS)
+	@$(CC) $^ -o $@ $(LDFLAGS)
+	@echo 'project is created'
 
 $(COBJ) : $(OUT_O_DIR)/%.o : %.cpp
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo 'compile $<'
 
 $(DEPS) : $(OUT_O_DIR)/%.d : %.cpp
 	@mkdir -p $(@D)
-	$(CC) -E $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
+	@$(CC) -E $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
 
 .PHONY: compile_commands
 compile_commands:
-	bear -- make
+	@bear -- make
 
 .PHONY: install 
 install: 
@@ -61,7 +63,7 @@ install:
 
 .PHONY: clean
 clean:
-	rm -rf ./build mandelbrot
+	@rm -rf ./build mandelbrot compile_commands.json
 
 # если вызванная цель НЕ clean то проверить изменения в хедэрах
 NODEPS = clean

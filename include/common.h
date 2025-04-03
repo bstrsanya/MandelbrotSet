@@ -49,7 +49,7 @@ const int DEEP_COLOR = 8;
 const int SIZE_TEST = 10;
 const int SIZE_PIXEL = 4;
 const int OPAQUE = 255;
-constexpr const char* WAY_FONT = "./font/1.otf";
+constexpr const char* WAY_FONT = "/usr/share/fonts/aajohan-comfortaa-fonts/Comfortaa-Bold.otf";
 constexpr const char* NAME_WINDOW = "Mandelbrot";
 
 const float SHIFT_COLOR = 0.5f;
