@@ -28,6 +28,23 @@ arg = tests | draw_type1 | draw_type2 | draw_type3
 
 **draw_type3** - third version graphics window
 
+## Format checking
+```
+clang-format -i src/
+clang-format -i include/
+```
+
+You can use common coding styles using the flag
+```
+--style=<string>
+```
+```
+string = LLVM | GNU | Google | Chromium | Microsoft | Mozilla | WebKit
+```
+
+> [!Note]
+> To configure your [.clang-format](.clang-format) you can use the [site](https://zed0.co.uk/clang-format-configurator/)
+
 ## Description
 
 Three versions of calculating the points of the Mandelbrot set are implemented with the same algorithm. The difference is only in the optimization of these calculations.
