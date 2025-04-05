@@ -33,8 +33,8 @@ ifeq ($(debug), true)
     override LDFLAGS += $(DEBUG_FLAGS)        
 endif
 
-CSRC = src/main.cpp src/count_pixel.cpp src/draw.cpp src/tests.cpp
-COBJ = $(addprefix $(OUT_O_DIR)/,$(CSRC:.cpp=.o))
+CSRC = src/main.c src/count_pixel.c src/draw.c src/tests.c
+COBJ = $(addprefix $(OUT_O_DIR)/,$(CSRC:.c=.o))
 DEPS = $(COBJ:.o=.d)
 
 .PHONY: all
@@ -44,12 +44,12 @@ mandelbrot: $(COBJ)
 	@$(CC) $^ -o $@ $(LDFLAGS)
 	@echo 'project is created'
 
-$(COBJ) : $(OUT_O_DIR)/%.o : %.cpp
+$(COBJ) : $(OUT_O_DIR)/%.o : %.c
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo 'compile $<'
 
-$(DEPS) : $(OUT_O_DIR)/%.d : %.cpp
+$(DEPS) : $(OUT_O_DIR)/%.d : %.c
 	@mkdir -p $(@D)
 	@$(CC) -E $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
 
