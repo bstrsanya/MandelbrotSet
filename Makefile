@@ -63,10 +63,10 @@ install:
 
 .PHONY: clean
 clean:
-	@rm -rf ./build mandelbrot compile_commands.json
+	@rm -rf $(OUT_O_DIR) mandelbrot compile_commands.json
 
 # если вызванная цель НЕ clean то проверить изменения в хедэрах
-NODEPS = clean
+NODEPS = clean install compile_commands
 ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
 include $(DEPS)
 endif
